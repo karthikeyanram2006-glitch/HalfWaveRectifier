@@ -1,0 +1,511 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Half-Wave Rectifier Virtual Lab</title>
+    <!-- Load Tailwind CSS for styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use Inter font -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #e5e7eb; }
+        /* Custom CSS for the canvas to look like a CRO screen */
+        #cro-canvas {
+            background-color: #0b110e; /* Dark green/black for CRO screen */
+            border: 2px solid #3c4040;
+            box-shadow: 0 0 10px rgba(0, 255, 0, 0.5), inset 0 0 10px rgba(0, 255, 0, 0.3);
+            border-radius: 8px;
+            touch-action: none; 
+        }
+        /* Style for the slider tracks */
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 50%;
+            background: #2563eb;
+            cursor: pointer;
+            box-shadow: 0 0 4px rgba(0, 0, 0, 0.4);
+        }
+        /* Style for details/summary */
+        details summary {
+            cursor: pointer;
+            padding: 0.75rem 0;
+            font-weight: 600;
+            color: #4f46e5;
+            transition: color 0.2s;
+        }
+        details summary:hover {
+            color: #3730a3;
+        }
+        details[open] summary {
+            border-bottom: 1px solid #e5e7eb;
+            margin-bottom: 0.5rem;
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8 flex justify-center items-start min-h-screen">
+
+    <div class="w-full max-w-6xl bg-white shadow-2xl rounded-xl p-6 md:p-8">
+        <h1 class="text-3xl font-bold text-center text-indigo-700 mb-6 border-b-2 pb-2">Half-Wave Rectifier Virtual Lab</h1>
+
+        <!-- Experiment Details Section -->
+        <div class="mb-8 border p-4 rounded-lg bg-indigo-50 border-indigo-200">
+            <h2 class="text-xl font-bold text-indigo-800 mb-4">Experiment 12: Diode Circuit / HWR</h2>
+            
+            <!-- AIM -->
+            <details class="mb-3">
+                <summary class="text-lg">Aim</summary>
+                <div class="text-gray-700 pl-4 border-l-2 border-indigo-400">
+                    <p>To study the characteristics of the **Half Wave Rectifier (HWR)** with and without a **capacitor filter** circuit.</p>
+                </div>
+            </details>
+
+            <!-- THEORY -->
+            <details class="mb-3">
+                <summary class="text-lg">Theory</summary>
+                <div class="text-gray-700 space-y-3 pl-4 border-l-2 border-indigo-400">
+                    <p>
+                        A rectifier changes **alternating current (AC) to direct current (DC)** and is an essential part of any power supply. This function utilizes the unique property of a diode, which permits current flow in only one direction.
+                    </p>
+                    <p>
+                        In a Half Wave Rectifier, the positive half cycles of the AC supply pass through the diode, while the negative half cycles are blocked (eliminated). The peak value of the output voltage is slightly less than the peak value of the input voltage by **0.6 V** (for a standard silicon diode) due to the voltage drop across the component.
+                    </p>
+                </div>
+            </details>
+
+            <!-- APPARATUS -->
+            <details>
+                <summary class="text-lg">Apparatus / Materials Required</summary>
+                <div class="text-gray-700 pl-4 border-l-2 border-indigo-400 overflow-x-auto">
+                    <table class="w-full min-w-max divide-y divide-gray-200 mt-2">
+                        <thead class="bg-indigo-100">
+                            <tr>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">S. No</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Apparatus Name</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Range</th>
+                                <th class="px-3 py-2 text-left text-xs font-medium text-gray-700 uppercase">Quantity</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200 text-sm">
+                            <tr><td class="px-3 py-2">1</td><td>PN Junction Diode</td><td>IN4001</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">2</td><td>Resistors</td><td>1 k&Omega;</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">3</td><td>Capacitor</td><td>100 &micro;F</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">4</td><td>CRO (Oscilloscope)</td><td>0-30 MHZ</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">5</td><td>Transformer</td><td>6-0-6V</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">6</td><td>Function Generator</td><td>N/A</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">7</td><td>Regulated Power Supply</td><td>0-30 V</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">8</td><td>Bread Board</td><td>N/A</td><td>01</td></tr>
+                            <tr><td class="px-3 py-2">9</td><td>Connecting Wires</td><td>N/A</td><td>As required</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+        </div>
+        <!-- End Experiment Details Section -->
+
+        <div class="grid lg:grid-cols-3 gap-6">
+
+            <!-- Controls and Parameters (Left/Middle Column) -->
+            <div class="lg:col-span-1 space-y-6">
+
+                <!-- Circuit Selection -->
+                <div class="bg-gray-50 p-4 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold text-gray-800 mb-3">Circuit Configuration</h2>
+                    <div class="flex space-x-2">
+                        <button id="no-filter-btn" onclick="setCircuit('no-filter')" class="flex-1 py-2 px-4 rounded-lg transition">Without Filter</button>
+                        <button id="with-filter-btn" onclick="setCircuit('with-filter')" class="flex-1 py-2 px-4 rounded-lg transition">With Capacitor Filter</button>
+                    </div>
+                </div>
+
+                <!-- Input Controls -->
+                <div class="bg-blue-50 p-4 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold text-blue-700 mb-4">Input Signal Controls (V_s)</h2>
+                    
+                    <div>
+                        <label for="freq-slider" class="block text-sm font-medium text-gray-700 mb-1">Frequency (f): <span id="freq-value" class="font-bold text-blue-600">50 Hz</span></label>
+                        <input type="range" id="freq-slider" min="20" max="200" value="50" step="5" oninput="updateValues()" class="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+
+                <!-- Load and Filter Controls -->
+                <div class="bg-green-50 p-4 rounded-lg shadow-md">
+                    <h2 class="text-xl font-semibold text-green-700 mb-4">Load & Filter Parameters</h2>
+                    
+                    <!-- Load Resistance (R_L) -->
+                    <div class="mb-4">
+                        <label for="load-slider" class="block text-sm font-medium text-gray-700 mb-1">Load Resistance (R_L): <span id="load-value" class="font-bold text-green-600">1.0 k&Omega;</span></label>
+                        <input type="range" id="load-slider" min="0.5" max="5" value="1.0" step="0.1" oninput="updateValues()" class="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+
+                    <!-- Filter Capacitance (C_F) -->
+                    <div id="cap-control-div">
+                        <label for="cap-slider" class="block text-sm font-medium text-gray-700 mb-1">Filter Capacitance (C_F): <span id="cap-value" class="font-bold text-green-600">100 &micro;F</span></label>
+                        <input type="range" id="cap-slider" min="10" max="1000" value="100" step="10" oninput="updateValues()" class="w-full h-2 bg-green-200 rounded-lg appearance-none cursor-pointer">
+                    </div>
+                </div>
+            </div>
+
+            <!-- CRO Display and Circuit (Right Columns) -->
+            <div class="lg:col-span-2 space-y-6">
+                <!-- CRO Canvas -->
+                <div class="flex flex-col items-center">
+                    <canvas id="cro-canvas" width="600" height="300" class="w-full max-w-full"></canvas>
+                    <p class="text-xs text-gray-500 mt-2">Time/Div: 5ms | Volts/Div: 2V (Approx)</p>
+                </div>
+
+                <!-- Live Readings & Circuit Diagram -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Live Readings -->
+                    <div class="bg-gray-100 p-4 rounded-lg shadow-md">
+                        <h2 class="text-xl font-semibold text-gray-800 mb-3">Live Output Readings</h2>
+                        <div class="space-y-2 text-sm">
+                            <div class="grid grid-cols-2">
+                                <span class="font-medium text-gray-600">Input V_peak:</span>
+                                <span class="font-bold text-indigo-600" id="input-vpeak-display">5.0 V</span>
+                            </div>
+                            <div class="grid grid-cols-2">
+                                <span class="font-medium text-gray-600">Output V_peak:</span>
+                                <span class="font-bold text-indigo-600" id="output-vpeak-display">--</span>
+                            </div>
+                            <div class="grid grid-cols-2">
+                                <span class="font-medium text-gray-600">Average DC (V_DC):</span>
+                                <span class="font-bold text-indigo-600" id="vdc-display">--</span>
+                            </div>
+                            <div class="grid grid-cols-2" id="ripple-display-row">
+                                <span class="font-medium text-gray-600">Ripple Voltage (&Delta;V):</span>
+                                <span class="font-bold text-indigo-600" id="vripple-display">--</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Circuit Diagram Container (Dynamically updated) -->
+                    <div id="circuit-image-container" class="bg-white p-4 rounded-lg shadow-md flex justify-center items-center">
+                        <!-- SVG circuit will be inserted here -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // --- CONSTANTS ---
+        const V_INPUT_PEAK = 5.0; // Fixed peak voltage of the AC source (5V)
+        const DIODE_DROP = 0.7; // Silicon diode voltage drop
+        const CANVAS = document.getElementById('cro-canvas');
+        const CTX = CANVAS.getContext('2d');
+        const CANVAS_WIDTH = CANVAS.width;
+        const CANVAS_HEIGHT = CANVAS.height;
+        const V_SCALE = 30; // Volts per screen height (approx 2V/Div * 5 Div = 10V)
+        const T_SCALE = 0.05; // Time period of the screen (5ms/Div * 10 Div = 50ms)
+
+        let currentCircuit = 'no-filter';
+        let R_LOAD = 1000; // Ohms
+        let C_FILTER = 100 * 1e-6; // Farads (100 uF)
+        let FREQUENCY = 50; // Hz
+
+        // --- DOM Elements ---
+        const NO_FILTER_BTN = document.getElementById('no-filter-btn');
+        const WITH_FILTER_BTN = document.getElementById('with-filter-btn');
+        const CAP_CONTROL_DIV = document.getElementById('cap-control-div');
+
+        // --- SVG Circuit Snippets (Cleaned up) ---
+
+        // Figure 1: HWR Without Filter
+        const SVG_HWR_NO_FILTER_SNIPPET = `
+            <svg width="250" height="120" viewBox="0 0 250 120" xmlns="http://www.w3.org/2000/svg" class="text-gray-800">
+                <text x="125" y="15" font-size="14" text-anchor="middle" fill="#1f2937" font-weight="bold">HWR Circuit (No Filter)</text>
+                <!-- AC Source Symbol -->
+                <circle cx="20" cy="50" r="10" stroke="#000" stroke-width="2" fill="none"/>
+                <path d="M15 50 C17 46, 23 46, 25 50 C23 54, 17 54, 15 50" stroke="#000" stroke-width="1.5" fill="none"/>
+                <line x1="20" y1="50" x2="20" y2="80" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="50" x2="50" y2="50" stroke="#000" stroke-width="2"/>
+                <text x="20" y="105" font-size="12" text-anchor="middle" fill="#000">AC Source</text>
+                
+                <!-- Diode (D1) -->
+                <line x1="50" y1="50" x2="70" y2="50" stroke="#000" stroke-width="2"/>
+                <polygon points="70,50 90,40 90,60" fill="#000" stroke="#000" stroke-width="2"/>
+                <line x1="90" y1="40" x2="90" y2="60" stroke="#000" stroke-width="2"/>
+                <line x1="90" y1="50" x2="110" y2="50" stroke="#000" stroke-width="2"/>
+                <text x="80" y="35" font-size="12" fill="#000">D1</text>
+                
+                <!-- Load Resistor (RL) -->
+                <line x1="110" y1="50" x2="130" y2="50" stroke="#000" stroke-width="2"/>
+                <path d="M130 50 L140 60 L150 40 L160 60 L170 40 L180 50" stroke="#000" stroke-width="2" fill="none"/>
+                <line x1="180" y1="50" x2="210" y2="50" stroke="#000" stroke-width="2"/>
+                <text x="150" y="35" font-size="12" text-anchor="middle" fill="#000">R_L</text>
+
+                <!-- Ground Return -->
+                <line x1="210" y1="50" x2="210" y2="80" stroke="#000" stroke-width="2"/>
+                <line x1="110" y1="80" x2="210" y2="80" stroke="#000" stroke-width="2"/>
+                <line x1="110" y1="80" x2="20" y2="80" stroke="#000" stroke-width="2"/>
+                <line x1="105" y1="90" x2="115" y2="90" stroke="#000" stroke-width="2"/>
+                <line x1="107" y1="95" x2="113" y2="95" stroke="#000" stroke-width="2"/>
+                <line x1="110" y1="100" x2="110" y2="100" stroke="#000" stroke-width="2"/>
+
+                <!-- Output terminals -->
+                <text x="160" y="95" font-size="12" fill="#2563eb">V_out</text>
+            </svg>
+        `;
+
+        // Figure 2: HWR With Filter
+        const SVG_HWR_WITH_FILTER_SNIPPET = `
+            <svg width="250" height="120" viewBox="0 0 250 120" xmlns="http://www.w3.org/2000/svg" class="text-gray-800">
+                <text x="125" y="15" font-size="14" text-anchor="middle" fill="#1f2937" font-weight="bold">HWR Circuit (With Filter)</text>
+                <!-- AC Source Symbol -->
+                <circle cx="20" cy="50" r="10" stroke="#000" stroke-width="2" fill="none"/>
+                <path d="M15 50 C17 46, 23 46, 25 50 C23 54, 17 54, 15 50" stroke="#000" stroke-width="1.5" fill="none"/>
+                <line x1="20" y1="50" x2="20" y2="80" stroke="#000" stroke-width="2"/>
+                <line x1="20" y1="50" x2="50" y2="50" stroke="#000" stroke-width="2"/>
+                <text x="20" y="105" font-size="12" text-anchor="middle" fill="#000">AC Source</text>
+                
+                <!-- Diode (D1) -->
+                <line x1="50" y1="50" x2="70" y2="50" stroke="#000" stroke-width="2"/>
+                <polygon points="70,50 90,40 90,60" fill="#000" stroke="#000" stroke-width="2"/>
+                <line x1="90" y1="40" x2="90" y2="60" stroke="#000" stroke-width="2"/>
+                <line x1="90" y1="50" x2="120" y2="50" stroke="#000" stroke-width="2"/>
+                <text x="80" y="35" font-size="12" fill="#000">D1</text>
+                
+                <!-- Load Resistor (RL) - Moved right to make space for capacitor -->
+                <line x1="120" y1="50" x2="140" y2="50" stroke="#000" stroke-width="2"/>
+                <path d="M140 50 L150 60 L160 40 L170 60 L180 40 L190 50" stroke="#000" stroke-width="2" fill="none"/>
+                <line x1="190" y1="50" x2="210" y2="50" stroke="#000" stroke-width="2"/>
+                <text x="165" y="35" font-size="12" text-anchor="middle" fill="#000">R_L</text>
+                
+                <!-- Capacitor (C_F) - Parallel to R_L -->
+                <line x1="120" y1="50" x2="120" y2="70" stroke="#000" stroke-width="2"/>
+                <line x1="110" y1="70" x2="130" y2="70" stroke="#000" stroke-width="3"/>
+                <line x1="110" y1="85" x2="130" y2="85" stroke="#000" stroke-width="3"/>
+                <line x1="120" y1="85" x2="120" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="120" y1="100" x2="120" y2="80" stroke="#000" stroke-width="2" opacity="0"/>
+                <text x="145" y="80" font-size="12" fill="#000">C_F</text>
+                
+                <!-- Ground Return -->
+                <line x1="210" y1="50" x2="210" y2="80" stroke="#000" stroke-width="2"/>
+                <line x1="120" y1="85" x2="210" y2="85" stroke="#000" stroke-width="2"/>
+                <line x1="120" y1="85" x2="20" y2="85" stroke="#000" stroke-width="2"/>
+                <line x1="115" y1="95" x2="125" y2="95" stroke="#000" stroke-width="2"/>
+                <line x1="117" y1="100" x2="123" y2="100" stroke="#000" stroke-width="2"/>
+                <line x1="120" y1="105" x2="120" y2="105" stroke="#000" stroke-width="2"/>
+
+                <!-- Output terminals -->
+                <text x="160" y="95" font-size="12" fill="#2563eb">V_out</text>
+            </svg>
+        `;
+
+
+        // --- SIMULATION LOGIC ---
+
+        function runSimulation() {
+            // 1. Get current parameter values
+            FREQUENCY = parseFloat(document.getElementById('freq-slider').value);
+            R_LOAD = parseFloat(document.getElementById('load-slider').value) * 1000; // in Ohms
+            C_FILTER = parseFloat(document.getElementById('cap-slider').value) * 1e-6; // in Farads
+
+            // 2. Clear and set up Canvas
+            CTX.clearRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+            drawGrid();
+
+            // 3. Calculate time and voltage steps
+            const PERIOD = 1 / FREQUENCY; // Time period
+            const TIME_STEP = PERIOD / 500; // 500 steps per period for smooth drawing
+            const X_SCALE = CANVAS_WIDTH / (5 * PERIOD); // Plot 5 periods on the screen
+
+            let vdc = 0;
+            let vripple = 0;
+            let vpeak_out = 0;
+            
+            // 4. Draw Input Voltage (AC Sine Wave)
+            CTX.strokeStyle = '#0f0'; // Bright Green
+            CTX.lineWidth = 1.5;
+            CTX.beginPath();
+
+            for (let t = 0; t <= 5 * PERIOD; t += TIME_STEP) {
+                const V_in = V_INPUT_PEAK * Math.sin(2 * Math.PI * FREQUENCY * t);
+                
+                const x = t * X_SCALE;
+                const y = CANVAS_HEIGHT / 2 - (V_in * (CANVAS_HEIGHT / V_SCALE));
+
+                if (t === 0) {
+                    CTX.moveTo(x, y);
+                } else {
+                    CTX.lineTo(x, y);
+                }
+            }
+            CTX.stroke();
+
+            // 5. Draw Output Voltage (V_L)
+            CTX.strokeStyle = '#2563eb'; // Blue
+            CTX.lineWidth = 2.5;
+            CTX.beginPath();
+
+            let V_L_prev = 0;
+            let V_L_max = 0;
+
+            for (let t = 0; t <= 5 * PERIOD; t += TIME_STEP) {
+                const V_in = V_INPUT_PEAK * Math.sin(2 * Math.PI * FREQUENCY * t);
+                let V_L = 0;
+                
+                // --- HWR Logic (shared) ---
+                let V_rectified = Math.max(0, V_in - DIODE_DROP); // Rectified voltage after diode drop
+
+                if (currentCircuit === 'no-filter') {
+                    // Simple HWR: Output is just the rectified signal
+                    V_L = V_rectified;
+                    vdc = (V_INPUT_PEAK - DIODE_DROP) / Math.PI; // Corrected theoretical V_DC for HWR
+                    vripple = V_INPUT_PEAK - DIODE_DROP; // Full peak-to-peak ripple for HWR
+                    V_L_max = Math.max(V_L_max, V_L); // Track max for display
+                } else {
+                    // HWR with Filter (Simple RC discharge model)
+                    if (V_rectified >= V_L_prev) {
+                        // Charging phase
+                        V_L = V_rectified;
+                    } else {
+                        // Discharging phase (RC time constant)
+                        const TAU = R_LOAD * C_FILTER;
+                        const dt = TIME_STEP;
+                        V_L = V_L_prev * Math.exp(-dt / TAU);
+                    }
+                    
+                    V_L_max = Math.max(V_L_max, V_L); 
+                }
+
+                const x = t * X_SCALE;
+                const y = CANVAS_HEIGHT / 2 - (V_L * (CANVAS_HEIGHT / V_SCALE));
+
+                if (t === 0) {
+                    CTX.moveTo(x, y);
+                } else {
+                    CTX.lineTo(x, y);
+                }
+                
+                V_L_prev = V_L;
+            }
+            CTX.stroke();
+            
+            // 6. Calculate Filtered Values (V_DC and V_ripple)
+            if (currentCircuit === 'with-filter') {
+                // Approximate Ripple and DC for a good filter
+                const V_peak_filtered = V_L_max; // Use the simulated peak
+                vpeak_out = V_peak_filtered;
+                vripple = V_peak_filtered / (FREQUENCY * R_LOAD * C_FILTER); // Theoretical approx
+                vdc = V_peak_filtered - (vripple / 2);
+            } else {
+                 // For no-filter, use the max calculated from the simulation/theory
+                vpeak_out = V_INPUT_PEAK - DIODE_DROP;
+                vdc = (V_INPUT_PEAK - DIODE_DROP) / Math.PI;
+                vripple = (V_INPUT_PEAK - DIODE_DROP);
+            }
+
+            // 7. Update Live Readings
+            document.getElementById('input-vpeak-display').textContent = `${V_INPUT_PEAK.toFixed(1)} V`;
+            document.getElementById('output-vpeak-display').textContent = `${vpeak_out.toFixed(2)} V`;
+            document.getElementById('vdc-display').textContent = `${vdc.toFixed(2)} V`;
+            document.getElementById('vripple-display').textContent = `${vripple.toFixed(2)} V`;
+            
+            // Show/Hide ripple row based on filter
+            const rippleRow = document.getElementById('ripple-display-row');
+            if (currentCircuit === 'no-filter') {
+                rippleRow.classList.add('hidden');
+            } else {
+                rippleRow.classList.remove('hidden');
+            }
+        }
+
+        // --- UI Functions ---
+
+        function drawGrid() {
+            // Draw axes
+            CTX.strokeStyle = '#3c4040'; // Gray
+            CTX.lineWidth = 1;
+            
+            // Center horizontal line (Time axis)
+            CTX.beginPath();
+            CTX.moveTo(0, CANVAS_HEIGHT / 2);
+            CTX.lineTo(CANVAS_WIDTH, CANVAS_HEIGHT / 2);
+            CTX.stroke();
+
+            // Center vertical line (Voltage axis)
+            CTX.beginPath();
+            CTX.moveTo(CANVAS_WIDTH / 2, 0);
+            CTX.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
+            CTX.stroke();
+            
+            // Draw major grid lines (2V/Div, 5ms/Div)
+            CTX.strokeStyle = '#1e281f'; // Darker grid
+            CTX.lineWidth = 0.5;
+            
+            const numDivsX = 10;
+            const numDivsY = 6;
+
+            // Vertical lines (Time)
+            for (let i = 1; i < numDivsX; i++) {
+                CTX.beginPath();
+                CTX.moveTo(i * (CANVAS_WIDTH / numDivsX), 0);
+                CTX.lineTo(i * (CANVAS_WIDTH / numDivsX), CANVAS_HEIGHT);
+                CTX.stroke();
+            }
+
+            // Horizontal lines (Voltage)
+            for (let i = 1; i < numDivsY; i++) {
+                CTX.beginPath();
+                CTX.moveTo(0, i * (CANVAS_HEIGHT / numDivsY));
+                CTX.lineTo(CANVAS_WIDTH, i * (CANVAS_HEIGHT / numDivsY));
+                CTX.stroke();
+            }
+        }
+
+        function updateValues() {
+            // Update slider text values
+            const freqHz = document.getElementById('freq-slider').value;
+            const loadKOhms = parseFloat(document.getElementById('load-slider').value);
+            const capuF = document.getElementById('cap-slider').value;
+
+            // Using HTML entities here for the clean display
+            document.getElementById('freq-value').textContent = `${freqHz} Hz`;
+            document.getElementById('load-value').innerHTML = `${loadKOhms.toFixed(1)} k&Omega;`;
+            document.getElementById('cap-value').innerHTML = `${capuF} &micro;F`;
+
+            // Re-run simulation
+            runSimulation();
+        }
+
+        function setCircuit(mode) {
+            currentCircuit = mode;
+
+            // Update button styles and circuit image
+            if (mode === 'no-filter') {
+                NO_FILTER_BTN.classList.remove('bg-gray-200', 'text-gray-800');
+                NO_FILTER_BTN.classList.add('bg-blue-600', 'text-white');
+                WITH_FILTER_BTN.classList.remove('bg-blue-600', 'text-white');
+                WITH_FILTER_BTN.classList.add('bg-gray-200', 'text-gray-800');
+                CAP_CONTROL_DIV.classList.add('opacity-50', 'pointer-events-none');
+                
+                document.getElementById('circuit-image-container').innerHTML = SVG_HWR_NO_FILTER_SNIPPET;
+            } else {
+                NO_FILTER_BTN.classList.remove('bg-blue-600', 'text-white');
+                NO_FILTER_BTN.classList.add('bg-gray-200', 'text-gray-800');
+                WITH_FILTER_BTN.classList.remove('bg-gray-200', 'text-gray-800');
+                WITH_FILTER_BTN.classList.add('bg-blue-600', 'text-white');
+                CAP_CONTROL_DIV.classList.remove('opacity-50', 'pointer-events-none');
+                
+                document.getElementById('circuit-image-container').innerHTML = SVG_HWR_WITH_FILTER_SNIPPET;
+            }
+
+            runSimulation();
+        }
+
+        // --- INITIAL SETUP ---
+        window.onload = function() {
+            // Set static input reading
+            document.getElementById('input-vpeak-display').textContent = `${V_INPUT_PEAK.toFixed(1)} V`;
+            
+            setCircuit('no-filter'); // Initialize to the first circuit
+            updateValues(); // Load initial values and run simulation
+        }
+    </script>
+</body>
+</html>
